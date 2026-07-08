@@ -1,25 +1,53 @@
+import { Button } from "@/components/base/buttons/button";
+import { Badge } from "@/components/base/badges/badges";
+
 // This is a SERVER component: the fetch runs inside the container, so it uses the
 // internal service URL (http://backend:3001). A client component in the browser would
 // instead use process.env.NEXT_PUBLIC_API_URL (http://localhost:3001).
 async function getHello() {
-  const url = process.env.BACKEND_URL_INTERNAL ?? 'http://localhost:3001'
-  try {
-    const res = await fetch(`${url}/api/hello`, { cache: 'no-store' })
-    return (await res.json()) as { message: string }
-  } catch {
-    return { message: '⚠️ Backend not reachable — is the backend service up?' }
-  }
+    const url = process.env.BACKEND_URL_INTERNAL ?? "http://localhost:3001";
+    try {
+        const res = await fetch(`${url}/api/hello`, { cache: "no-store" });
+        return (await res.json()) as { message: string };
+    } catch {
+        return { message: "⚠️ Backend not reachable — is the backend service up?" };
+    }
 }
 
 export default async function Page() {
-  const data = await getHello()
-  return (
-    <main style={{ padding: 48, maxWidth: 640 }}>
-      <h1>One-click scaffold</h1>
-      <p>Frontend (Next.js) → Backend (Hono) → Database (Postgres), all wired.</p>
-      <p style={{ padding: 16, background: '#f4f4f5', borderRadius: 8 }}>
-        <strong>API says:</strong> {data.message}
-      </p>
-    </main>
-  )
+    const data = await getHello();
+
+    return (
+        <main className="mx-auto max-w-container px-6 py-12">
+            <div className="flex flex-col gap-8">
+                <div className="flex flex-col gap-3">
+                    <Badge type="pill-color" color="brand" size="sm">
+                        Untitled UI ready
+                    </Badge>
+                    <h1 className="text-display-sm font-semibold text-primary">One-click scaffold</h1>
+                    <p className="text-md text-tertiary">
+                        Frontend (Next.js) → Backend (Hono) → Database (Postgres), all wired.
+                    </p>
+                </div>
+
+                <div className="rounded-xl bg-secondary p-4 ring-1 ring-secondary">
+                    <p className="text-md text-secondary">
+                        <strong className="text-primary">API says:</strong> {data.message}
+                    </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                    <Button color="primary" size="md">
+                        Primary button
+                    </Button>
+                    <Button color="secondary" size="md">
+                        Secondary
+                    </Button>
+                    <Button color="link-color" size="md" href="https://www.untitledui.com/react/docs/cli">
+                        Add more components
+                    </Button>
+                </div>
+            </div>
+        </main>
+    );
 }

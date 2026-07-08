@@ -1,72 +1,166 @@
-# One-click full-stack scaffold
+# Local Usage Guide
 
-Next.js (web) + Hono (api, OpenAPI/Swagger) + Postgres (db, Drizzle ORM).
+Full-stack scaffold: **Next.js** (web) + **Hono** (api) + **PostgreSQL** (db), orchestrated with Docker Compose.
 
-## Local development
+| Service | Tech | Role |
+|---------|------|------|
+| **frontend** | Next.js 15 (React) | Frontend — server component fetches from the API |
+| **backend** | Hono + Zod OpenAPI | Backend — REST API with auto-generated Swagger docs |
+| **db** | PostgreSQL 17 | Database — accessed via Drizzle ORM |
 
-```bash
-docker compose up --build -V              # -V refreshes node_modules after dep changes
-docker compose exec backend npm run db:push   # create the `users` table
-```
-
-- Web: http://localhost:3000 · Swagger: http://localhost:3001/ui · DB: localhost:5432 (app/dev/app)
-- Studio GUI: `docker compose exec backend npm run db:studio` → open https://local.drizzle.studio
-
-Local uses the `Dockerfile.dev` images (hot reload). Production uses `Dockerfile`.
+The demo includes a `users` table and CRUD endpoints (`GET/POST /api/users`), plus a hello endpoint the frontend displays. Source is bind-mounted into containers for hot reload.
 
 ---
 
-## Deploying to Railway
+## 1) First-time setup
 
-**Recommended:** Use the Cursor skill at `.cursor/skills/spin-up-mvp-scaffold/` — invoke it in chat with *"spin up a new mvp-scaffold project"* to create your GitHub repo, deploy the one-click Railway template, and wire production + staging automatically.
+### Prerequisites
 
-**Manual setup** (below): Railway does NOT use `docker-compose.yml`. You recreate the three services in one
-Railway **project** (one project = one private network + shared reference variables).
-Push this repo to GitHub first.
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or Docker Engine + Docker Compose v2)
+- Ports **3000**, **3001**, **5432**, and **4983** available on your machine
 
-### 1. Postgres
-New Project → **+ New** → **Database** → **PostgreSQL**. It exposes `DATABASE_URL`.
+### Steps
 
-### 2. api service
-### 2. backend service
-**+ New → GitHub Repo →** this repo. In the service **Settings**:
-- **Root Directory:** `backend`  (Railway then builds `backend/Dockerfile` — the production one)
-- **Networking:** Generate a public domain if you want Swagger reachable (optional).
-
-**Variables** (Settings → Variables):
-```
-DATABASE_URL = ${{Postgres.DATABASE_URL}}      # reference var, stays in sync
-PORT         = 3001                            # PIN it (see note) — app listens on $PORT
-FRONTEND_ORIGIN   = https://${{frontend.RAILWAY_PUBLIC_DOMAIN}}   # for CORS, once frontend exists
-```
-The production Dockerfile runs `db:migrate` on boot, so the committed migration in
-`backend/drizzle/` creates the `users` table automatically on first deploy.
-
-### 3. frontend service
-**+ New → GitHub Repo →** same repo. In **Settings**:
-- **Root Directory:** `frontend`
-- **Networking:** Generate a public domain (this is the URL users visit).
-
-**Variables:**
-```
-# Server-side Next fetches go over the PRIVATE network (no egress fees):
-BACKEND_URL_INTERNAL   = http://${{backend.RAILWAY_PRIVATE_DOMAIN}}:${{backend.PORT}}
-# Only needed if/when you add BROWSER-side calls (inlined at build):
-NEXT_PUBLIC_API_URL = https://${{api.RAILWAY_PUBLIC_DOMAIN}}
+```bash
+# 2. Build images and start all services
+#    -V recreates anonymous volumes (fresh node_modules in containers)
+docker compose up --build -V
 ```
 
-### Why PORT must be pinned
-Railway injects a *random* `PORT` at runtime that you can't reference from another
-service. Setting `PORT = 3001` on the api makes `${{api.PORT}}` resolve, so the web
-service's private URL to the api is stable. The app still just reads `process.env.PORT`.
+Wait until you see logs like `API listening on :3001` and the Next.js dev server is ready. The API starts only after Postgres passes its health check.
 
-### The same three keys, filled differently
-`DATABASE_URL`, `BACKEND_URL_INTERNAL`, `NEXT_PUBLIC_API_URL`, and `FRONTEND_ORIGIN` are the exact keys compose
-sets locally — Railway just fills them from reference variables instead. That's the
-whole point of the env-var contract: the code never changed.
+In a **second terminal** (while the stack is running):
 
-### Notes
-- Browser → api must use the PUBLIC domain; only server-side code may use `*.railway.internal`.
-- For production rigor, keep using committed migrations (`db:generate` + `db:migrate`),
-  not `db:push`.
-- The Dockerfiles make the eventual move to your own GCP/AWS a deploy-target swap.
+```bash
+# 3. Create the database tables (required once, or after schema changes)
+docker compose exec backend npm run db:push
+```
+
+### Verify it works
+
+1. Open http://localhost:3000 — you should see "API says: Hello from the Hono API 👋"
+2. Open http://localhost:3001/ui — Swagger UI
+3. In Swagger, try `POST /api/users` with `{ "email": "ada@example.com", "name": "Ada" }`, then `GET /api/users`
+
+> You do not need to copy `.env.example` for local Docker dev — `docker-compose.yml` injects the env vars. `.env.example` documents the contract for non-Docker or production deployments.
+
+---
+
+## 2) Useful URLs
+
+| What | URL | Notes |
+|------|-----|-------|
+| **Web app** | http://localhost:3000 | Next.js frontend |
+| **Swagger UI** | http://localhost:3001/ui | Interactive API docs — try endpoints here |
+| **OpenAPI spec** | http://localhost:3001/doc | Raw JSON spec |
+| **Health check** | http://localhost:3001/health | `{ "status": "ok" }` |
+| **Hello endpoint** | http://localhost:3001/api/hello | Used by the frontend |
+| **List users** | http://localhost:3001/api/users | Empty until you POST one |
+| **Drizzle Studio** | https://local.drizzle.studio | DB GUI — only after running `db:studio` (see below) |
+| **Postgres** | `localhost:5432` | User: `app`, Password: `dev`, Database: `app` |
+
+---
+
+## 3) Useful commands
+
+All commands below assume you are in the project root.
+
+### Starting & stopping
+
+```bash
+# Start (foreground, see logs)
+docker compose up --build -V
+
+# Start detached (background)
+docker compose up --build -V -d
+
+# Stop services (keeps database data)
+docker compose down
+
+# Stop AND wipe the database volume (full reset)
+docker compose down -v
+
+# Stop a single service
+docker compose stop backend
+```
+
+If you started in the foreground, `Ctrl+C` stops the stack. Run `docker compose down` afterward if containers are still running.
+
+### Installing packages
+
+Packages live **inside the containers**, not on your host. Install via `exec`:
+
+```bash
+# Backend
+docker compose exec backend npm install <package-name>
+
+# Frontend
+docker compose exec frontend npm install <package-name>
+```
+
+If you edited `package.json` directly or changed a Dockerfile, rebuild so `node_modules` is refreshed:
+
+```bash
+# Rebuild everything
+docker compose up --build -V
+
+# Rebuild just one service
+docker compose up --build -V backend
+docker compose up --build -V frontend
+```
+
+### Database (Drizzle)
+
+Run these inside the **backend** container:
+
+```bash
+# Sync schema to DB (fast, good for dev) — use after changing schema.ts
+docker compose exec backend npm run db:push
+
+# Generate versioned SQL migration files (production-style)
+docker compose exec backend npm run db:generate
+
+# Apply migration files
+docker compose exec backend npm run db:migrate
+
+# Launch Drizzle Studio GUI
+docker compose exec backend npm run db:studio
+# Then open https://local.drizzle.studio
+```
+
+### Logs & shell access
+
+```bash
+# Follow all logs
+docker compose logs -f
+
+# Logs for one service
+docker compose logs -f backend
+
+# Shell into a container
+docker compose exec backend sh
+docker compose exec frontend sh
+docker compose exec db psql -U app -d app
+```
+
+### Development workflow
+
+- **Edit code** — save files under `backend/` or `frontend/`; hot reload picks up changes automatically
+- **Add API routes** — edit `backend/src/index.ts`; they appear in Swagger automatically
+- **Change DB schema** — edit `backend/src/db/schema.ts`, then run `db:push` (or `db:generate` + `db:migrate`)
+- **Node version** — controlled by `FROM node:22-alpine` in each Dockerfile, not `.nvmrc`
+
+---
+
+## Project layout
+
+```
+├── docker-compose.yml        # Orchestrates db, backend, frontend
+├── .env.example              # Env var contract (reference only for local Docker)
+├── backend/
+│   ├── src/index.ts          # Hono routes + OpenAPI
+│   ├── src/db/schema.ts      # Drizzle table definitions
+│   └── drizzle/              # Generated migrations
+└── frontend/
+    └── app/page.tsx         # Next.js home page (server component)
+```
