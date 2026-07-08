@@ -18,7 +18,9 @@ Local uses the `Dockerfile.dev` images (hot reload). Production uses `Dockerfile
 
 ## Deploying to Railway
 
-Railway does NOT use `docker-compose.yml`. You recreate the three services in one
+**Recommended:** Use the Cursor skill at `.cursor/skills/spin-up-mvp-scaffold/` — invoke it in chat with *"spin up a new mvp-scaffold project"* to create your GitHub repo, deploy the one-click Railway template, and wire production + staging automatically.
+
+**Manual setup** (below): Railway does NOT use `docker-compose.yml`. You recreate the three services in one
 Railway **project** (one project = one private network + shared reference variables).
 Push this repo to GitHub first.
 
