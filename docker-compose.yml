@@ -18,9 +18,9 @@ services:
       timeout: 5s
       retries: 10
 
-  api:
+  backend:
     build:
-      context: ./api
+      context: ./backend
       dockerfile: Dockerfile.dev
     restart: unless-stopped
     depends_on:
@@ -29,28 +29,28 @@ services:
     environment:
       PORT: 3001
       DATABASE_URL: postgres://app:dev@db:5432/app
-      WEB_ORIGIN: http://localhost:3000
+      FRONTEND_ORIGIN: http://localhost:3000
     ports:
       - "3001:3001"
       - "4983:4983"
     volumes:
-      - ./api:/app
+      - ./backend:/app
       - /app/node_modules
 
-  web:
+  frontend:
     build:
-      context: ./web
+      context: ./frontend
       dockerfile: Dockerfile.dev
     restart: unless-stopped
     depends_on:
-      - api
+      - backend
     environment:
-      API_URL_INTERNAL: http://api:3001
+      BACKEND_URL_INTERNAL: http://backend:3001
       NEXT_PUBLIC_API_URL: http://localhost:3001
     ports:
       - "3000:3000"
     volumes:
-      - ./web:/app
+      - ./frontend:/app
       - /app/node_modules
 
 volumes:

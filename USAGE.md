@@ -4,8 +4,8 @@ Full-stack scaffold: **Next.js** (web) + **Hono** (api) + **PostgreSQL** (db), o
 
 | Service | Tech | Role |
 |---------|------|------|
-| **web** | Next.js 15 (React) | Frontend — server component fetches from the API |
-| **api** | Hono + Zod OpenAPI | Backend — REST API with auto-generated Swagger docs |
+| **frontend** | Next.js 15 (React) | Frontend — server component fetches from the API |
+| **backend** | Hono + Zod OpenAPI | Backend — REST API with auto-generated Swagger docs |
 | **db** | PostgreSQL 17 | Database — accessed via Drizzle ORM |
 
 The demo includes a `users` table and CRUD endpoints (`GET/POST /api/users`), plus a hello endpoint the frontend displays. Source is bind-mounted into containers for hot reload.
@@ -22,9 +22,6 @@ The demo includes a `users` table and CRUD endpoints (`GET/POST /api/users`), pl
 ### Steps
 
 ```bash
-# 1. Go to the project root
-cd one-click
-
 # 2. Build images and start all services
 #    -V recreates anonymous volumes (fresh node_modules in containers)
 docker compose up --build -V
@@ -35,10 +32,8 @@ Wait until you see logs like `API listening on :3001` and the Next.js dev server
 In a **second terminal** (while the stack is running):
 
 ```bash
-cd one-click
-
 # 3. Create the database tables (required once, or after schema changes)
-docker compose exec api npm run db:push
+docker compose exec backend npm run db:push
 ```
 
 ### Verify it works
@@ -68,7 +63,7 @@ docker compose exec api npm run db:push
 
 ## 3) Useful commands
 
-All commands below assume you are in the `one-click/` directory.
+All commands below assume you are in the project root.
 
 ### Starting & stopping
 
@@ -86,7 +81,7 @@ docker compose down
 docker compose down -v
 
 # Stop a single service
-docker compose stop api
+docker compose stop backend
 ```
 
 If you started in the foreground, `Ctrl+C` stops the stack. Run `docker compose down` afterward if containers are still running.
@@ -97,10 +92,10 @@ Packages live **inside the containers**, not on your host. Install via `exec`:
 
 ```bash
 # Backend
-docker compose exec api npm install <package-name>
+docker compose exec backend npm install <package-name>
 
 # Frontend
-docker compose exec web npm install <package-name>
+docker compose exec frontend npm install <package-name>
 ```
 
 If you edited `package.json` directly or changed a Dockerfile, rebuild so `node_modules` is refreshed:
@@ -110,26 +105,26 @@ If you edited `package.json` directly or changed a Dockerfile, rebuild so `node_
 docker compose up --build -V
 
 # Rebuild just one service
-docker compose up --build -V api
-docker compose up --build -V web
+docker compose up --build -V backend
+docker compose up --build -V frontend
 ```
 
 ### Database (Drizzle)
 
-Run these inside the **api** container:
+Run these inside the **backend** container:
 
 ```bash
 # Sync schema to DB (fast, good for dev) — use after changing schema.ts
-docker compose exec api npm run db:push
+docker compose exec backend npm run db:push
 
 # Generate versioned SQL migration files (production-style)
-docker compose exec api npm run db:generate
+docker compose exec backend npm run db:generate
 
 # Apply migration files
-docker compose exec api npm run db:migrate
+docker compose exec backend npm run db:migrate
 
 # Launch Drizzle Studio GUI
-docker compose exec api npm run db:studio
+docker compose exec backend npm run db:studio
 # Then open https://local.drizzle.studio
 ```
 
@@ -140,19 +135,19 @@ docker compose exec api npm run db:studio
 docker compose logs -f
 
 # Logs for one service
-docker compose logs -f api
+docker compose logs -f backend
 
 # Shell into a container
-docker compose exec api sh
-docker compose exec web sh
+docker compose exec backend sh
+docker compose exec frontend sh
 docker compose exec db psql -U app -d app
 ```
 
 ### Development workflow
 
-- **Edit code** — save files under `api/` or `web/`; hot reload picks up changes automatically
-- **Add API routes** — edit `api/src/index.ts`; they appear in Swagger automatically
-- **Change DB schema** — edit `api/src/db/schema.ts`, then run `db:push` (or `db:generate` + `db:migrate`)
+- **Edit code** — save files under `backend/` or `frontend/`; hot reload picks up changes automatically
+- **Add API routes** — edit `backend/src/index.ts`; they appear in Swagger automatically
+- **Change DB schema** — edit `backend/src/db/schema.ts`, then run `db:push` (or `db:generate` + `db:migrate`)
 - **Node version** — controlled by `FROM node:22-alpine` in each Dockerfile, not `.nvmrc`
 
 ---
@@ -160,13 +155,12 @@ docker compose exec db psql -U app -d app
 ## Project layout
 
 ```
-one-click/
-├── docker-compose.yml    # Orchestrates db, api, web
-├── .env.example          # Env var contract (reference only for local Docker)
-├── api/
-│   ├── src/index.ts      # Hono routes + OpenAPI
-│   ├── src/db/schema.ts  # Drizzle table definitions
-│   └── drizzle/          # Generated migrations
-└── web/
-    └── app/page.tsx      # Next.js home page (server component)
+├── docker-compose.yml        # Orchestrates db, backend, frontend
+├── .env.example              # Env var contract (reference only for local Docker)
+├── backend/
+│   ├── src/index.ts          # Hono routes + OpenAPI
+│   ├── src/db/schema.ts      # Drizzle table definitions
+│   └── drizzle/              # Generated migrations
+└── frontend/
+    └── app/page.tsx         # Next.js home page (server component)
 ```

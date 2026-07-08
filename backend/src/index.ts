@@ -8,8 +8,8 @@ import { users } from './db/schema'
 // OpenAPIHono is a drop-in extension of Hono: routes defined via createRoute
 // generate the OpenAPI spec automatically, so the docs can never drift.
 const app = new OpenAPIHono()
-// Locally this is localhost:3000; on Railway set WEB_ORIGIN to the web service's public URL.
-app.use('/*', cors({ origin: process.env.WEB_ORIGIN ?? 'http://localhost:3000' }))
+// Locally this is localhost:3000; on Railway set FRONTEND_ORIGIN to the web service's public URL.
+app.use('/*', cors({ origin: process.env.FRONTEND_ORIGIN ?? 'http://localhost:3000' }))
 
 // ---------- schemas (double as request validation AND doc components) ----------
 const UserSchema = z

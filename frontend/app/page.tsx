@@ -1,13 +1,13 @@
 // This is a SERVER component: the fetch runs inside the container, so it uses the
-// internal service URL (http://api:3001). A client component in the browser would
+// internal service URL (http://backend:3001). A client component in the browser would
 // instead use process.env.NEXT_PUBLIC_API_URL (http://localhost:3001).
 async function getHello() {
-  const url = process.env.API_URL_INTERNAL ?? 'http://localhost:3001'
+  const url = process.env.BACKEND_URL_INTERNAL ?? 'http://localhost:3001'
   try {
     const res = await fetch(`${url}/api/hello`, { cache: 'no-store' })
     return (await res.json()) as { message: string }
   } catch {
-    return { message: '⚠️ API not reachable — is the api service up?' }
+    return { message: '⚠️ Backend not reachable — is the backend service up?' }
   }
 }
 
