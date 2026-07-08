@@ -164,3 +164,23 @@ docker compose exec db psql -U app -d app
 └── frontend/
     └── app/page.tsx         # Next.js home page (server component)
 ```
+
+---
+
+## Spinning up a new project from this template
+
+### Prerequisites
+
+1. A [Railway](https://railway.com) account with your GitHub connected to it
+2. [GitHub CLI](https://cli.github.com/) and [Railway CLI](https://docs.railway.com/guides/cli) installed and logged in on your machine
+3. [Cursor](https://cursor.com), Codex, Claude Code, or an equivalent AI coding agent that can run the start command below
+
+### Start command
+
+Paste this into your agent to initiate a new project:
+
+```
+Initiate a new github project by copying the public github template repo -- https://github.com/Larza-Intelligence-Inc/mvp-scaffold
+
+Inside it, you will find a skill for how to intiate the project called "spin-up-mvp-scaffold". Run the skill.
+```
