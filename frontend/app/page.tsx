@@ -1,14 +1,14 @@
 import { Button } from "@/components/base/buttons/button";
 import { Badge } from "@/components/base/badges/badges";
+import { getServerBackendClient } from "@/generated/backend/client";
 
-// This is a SERVER component: the fetch runs inside the container, so it uses the
-// internal service URL (http://backend:3001). A client component in the browser would
-// instead use process.env.NEXT_PUBLIC_API_URL (http://localhost:3001).
 async function getHello() {
-    const url = process.env.BACKEND_URL_INTERNAL ?? "http://localhost:3001";
     try {
-        const res = await fetch(`${url}/api/hello`, { cache: "no-store" });
-        return (await res.json()) as { message: string };
+        const { data, error } = await getServerBackendClient().GET("/api/hello");
+        if (error || !data) {
+            return { message: "⚠️ Backend not reachable — is the backend service up?" };
+        }
+        return data;
     } catch {
         return { message: "⚠️ Backend not reachable — is the backend service up?" };
     }

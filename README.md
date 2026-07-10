@@ -52,7 +52,8 @@ docker compose exec backend npm run db:push
 |------|-----|-------|
 | **Web app** | http://localhost:3000 | Next.js frontend |
 | **Swagger UI** | http://localhost:3001/ui | Interactive API docs — try endpoints here |
-| **OpenAPI spec** | http://localhost:3001/doc | Raw JSON spec |
+| **OpenAPI (runtime)** | http://localhost:3001/openapi.json | Live JSON (exploration only) |
+| **OpenAPI lockfile** | `backend/openapi.json` | Committed artifact used for frontend codegen |
 | **Health check** | http://localhost:3001/health | `{ "status": "ok" }` |
 | **Hello endpoint** | http://localhost:3001/api/hello | Used by the frontend |
 | **List users** | http://localhost:3001/api/users | Empty until you POST one |
@@ -146,9 +147,31 @@ docker compose exec db psql -U app -d app
 ### Development workflow
 
 - **Edit code** — save files under `backend/` or `frontend/`; hot reload picks up changes automatically
-- **Add API routes** — edit `backend/src/index.ts`; they appear in Swagger automatically
+- **Add API routes** — edit `backend/src/app.ts`; they appear in Swagger automatically. Then regenerate the SDK (below).
 - **Change DB schema** — edit `backend/src/db/schema.ts`, then run `db:push` (or `db:generate` + `db:migrate`)
 - **Node version** — controlled by `FROM node:22-alpine` in each Dockerfile, not `.nvmrc`
+
+### OpenAPI lockfile + frontend SDK
+
+The API surface is locked in **`backend/openapi.json`** (committed). Frontend types are generated from that **file**, not from a running server — so builds never need a live backend.
+
+```bash
+# After changing routes/schemas in backend/src/app.ts:
+cd backend && npm run openapi:emit
+cd ../frontend && npm run generate:api
+```
+
+Or ask the agent to run the **generate-frontend-sdk** skill (same two steps; never starts the API).
+
+| Piece | Role |
+|-------|------|
+| `backend/openapi.json` | API lockfile (`servers: [{ url: '/' }]` — origin comes from the client) |
+| `frontend/generated/backend/schema.ts` | Generated types (`openapi-typescript`) |
+| `frontend/generated/backend/client.ts` | Hand-written `openapi-fetch` client; `baseUrl` from env |
+| `BACKEND_URL_INTERNAL` | Server-side base URL (e.g. `http://backend:3001` in Docker) |
+| `NEXT_PUBLIC_API_URL` | Browser base URL (e.g. `http://localhost:3001`) |
+
+Runtime `/openapi.json` and `/ui` remain available for local exploration; codegen does not use them.
 
 ---
 
@@ -157,12 +180,19 @@ docker compose exec db psql -U app -d app
 ```
 ├── docker-compose.yml        # Orchestrates db, backend, frontend
 ├── .env.example              # Env var contract (reference only for local Docker)
+├── .cursor/skills/
+│   ├── spin-up-mvp-scaffold/ # Bootstrap a new project from this template
+│   └── generate-frontend-sdk/# Emit openapi.json + regenerate frontend types
 ├── backend/
-│   ├── src/index.ts          # Hono routes + OpenAPI
+│   ├── openapi.json          # Committed OpenAPI lockfile
+│   ├── scripts/emit-openapi.ts
+│   ├── src/app.ts            # Hono routes + OpenAPI registration
+│   ├── src/index.ts          # serve() entry only
 │   ├── src/db/schema.ts      # Drizzle table definitions
 │   └── drizzle/              # Generated migrations
 └── frontend/
-    └── app/page.tsx         # Next.js home page (server component)
+    ├── generated/backend/    # openapi-fetch SDK (schema.ts generated)
+    └── app/page.tsx          # Next.js home page (server component)
 ```
 
 ---
