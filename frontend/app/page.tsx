@@ -1,4 +1,4 @@
-import { ComponentShowcase } from "@/components/landing/component-showcase";
+import { WelcomeHero } from "@/components/landing/welcome-hero";
 import { getServerBackendClient } from "@/generated/backend/client";
 
 async function getHello() {
@@ -17,8 +17,8 @@ export default async function Page() {
     const data = await getHello();
 
     return (
-        <main className="mx-auto max-w-container px-6 py-12">
-            <ComponentShowcase apiMessage={data.message} />
+        <main className="mx-auto flex min-h-dvh max-w-container flex-col justify-center px-6 py-16">
+            <WelcomeHero apiMessage={data.message} />
         </main>
     );
 }

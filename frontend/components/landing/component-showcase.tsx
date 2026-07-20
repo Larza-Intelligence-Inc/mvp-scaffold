@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Selection } from "react-aria-components";
-import { Calendar, Check, HelpCircle, Mail01, Plus, SearchLg, Trash01 } from "@untitledui/icons";
+import { ArrowLeft, Calendar, Check, HelpCircle, Mail01, Plus, SearchLg, Trash01 } from "@untitledui/icons";
 import { Dialog, DialogTrigger, Modal, ModalOverlay } from "@/components/application/modals/modal";
 import { Badge, BadgeWithDot, BadgeWithIcon } from "@/components/base/badges/badges";
 import { Button } from "@/components/base/buttons/button";
@@ -73,12 +73,15 @@ function ModalDemo() {
     );
 }
 
-export function ComponentShowcase({ apiMessage }: { apiMessage: string }) {
+export function ComponentShowcase() {
     const [selectedTags, setSelectedTags] = useState<Selection>(new Set(["design"]));
 
     return (
         <div className="flex flex-col gap-12">
             <header className="flex flex-col gap-4">
+                <Button color="link-gray" size="sm" href="/" iconLeading={ArrowLeft} className="self-start">
+                    Back to home
+                </Button>
                 <Badge type="pill-color" color="brand" size="sm">
                     Untitled UI showcase
                 </Badge>
@@ -87,11 +90,6 @@ export function ComponentShowcase({ apiMessage }: { apiMessage: string }) {
                     <p className="max-w-2xl text-md text-tertiary">
                         Major Untitled UI primitives available in this scaffold — buttons, badges, inputs, tags,
                         tooltips, and modals.
-                    </p>
-                </div>
-                <div className="rounded-xl bg-secondary p-4 ring-1 ring-secondary">
-                    <p className="text-md text-secondary">
-                        <strong className="text-primary">API says:</strong> {apiMessage}
                     </p>
                 </div>
                 <nav className="flex flex-wrap gap-2">
