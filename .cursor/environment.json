@@ -1,6 +1,6 @@
 {
   "snapshot": "snapshot-20260709-ce67c4d0-902a-4ec6-a143-2b191ea03633",
-  "install": "npm install --prefix backend\nnpm install --prefix frontend\npython3 -m venv .venv\n.venv/bin/pip install -e \".[dev]\"",
+  "install": "npm install --prefix backend --legacy-peer-deps\nnpm install --prefix frontend\npython3 -m venv .venv\n.venv/bin/pip install -e \".[dev]\"",
   "start": "sudo pg_ctlcluster 16 main start",
   "terminals": [
     {
