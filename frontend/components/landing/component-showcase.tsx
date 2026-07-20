@@ -275,24 +275,23 @@ export function ComponentShowcase({ apiMessage }: { apiMessage: string }) {
             <Section id="tooltips" title="Tooltips" description="Contextual help on hover or focus.">
                 <div className="flex flex-wrap items-center gap-4">
                     <Tooltip title="Quick tip" description="Tooltips support a title and optional description." arrow>
-                        <TooltipTrigger>
-                            <Button color="secondary" size="md" iconLeading={HelpCircle}>
-                                Hover me
-                            </Button>
-                        </TooltipTrigger>
+                        <Button color="secondary" size="md" iconLeading={HelpCircle}>
+                            Hover me
+                        </Button>
                     </Tooltip>
                     <Tooltip title="Top placement" placement="top">
-                        <TooltipTrigger>
-                            <Button color="tertiary" size="md">
-                                Top
-                            </Button>
-                        </TooltipTrigger>
+                        <Button color="tertiary" size="md">
+                            Top
+                        </Button>
                     </Tooltip>
                     <Tooltip title="Bottom placement" placement="bottom">
+                        <Button color="tertiary" size="md">
+                            Bottom
+                        </Button>
+                    </Tooltip>
+                    <Tooltip title="Icon trigger" description="TooltipTrigger wraps non-button content.">
                         <TooltipTrigger>
-                            <Button color="tertiary" size="md">
-                                Bottom
-                            </Button>
+                            <HelpCircle className="size-5 text-fg-quaternary" />
                         </TooltipTrigger>
                     </Tooltip>
                 </div>
