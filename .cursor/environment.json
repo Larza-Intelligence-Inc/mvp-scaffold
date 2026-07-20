@@ -1,4 +1,21 @@
 {
-    "snapshot": "snapshot-20260709-ce67c4d0-902a-4ec6-a143-2b191ea03633",
-    "install": "npm install --prefix backend\nnpm install --prefix frontend\npython3 -m venv .venv\n.venv/bin/pip install -e \".[dev]\""
-  }
+  "snapshot": "snapshot-20260709-ce67c4d0-902a-4ec6-a143-2b191ea03633",
+  "install": "npm install --prefix backend\nnpm install --prefix frontend\npython3 -m venv .venv\n.venv/bin/pip install -e \".[dev]\"",
+  "start": "sudo pg_ctlcluster 16 main start",
+  "terminals": [
+    {
+      "name": "backend",
+      "description": "Wait for Postgres, sync Drizzle schema (db:push), then run the Hono API on :3001",
+      "command": "until pg_isready -h localhost -q; do sleep 0.5; done; DATABASE_URL=\"postgres://app:dev@localhost:5432/app\" npm run db:push --prefix backend && PORT=3001 DATABASE_URL=\"postgres://app:dev@localhost:5432/app\" FRONTEND_ORIGIN=\"http://localhost:3000\" npm run dev --prefix backend"
+    },
+    {
+      "name": "frontend",
+      "description": "Next.js app on :3000 (API via localhost:3001)",
+      "command": "BACKEND_URL_INTERNAL=\"http://localhost:3001\" NEXT_PUBLIC_API_URL=\"http://localhost:3001\" npm run dev --prefix frontend"
+    }
+  ],
+  "ports": [
+    { "name": "frontend", "port": 3000 },
+    { "name": "backend", "port": 3001 }
+  ]
+}
