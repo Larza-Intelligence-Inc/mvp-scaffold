@@ -1,8 +1,8 @@
 @theme {
-    /* FONT FAMILY */
-    --font-body: var(--font-inter, "Inter"), -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-    --font-display: var(--font-inter, "Inter"), -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-    --font-mono: ui-monospace, "Roboto Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    /* FONT FAMILY — Larza: Hanken Grotesk (UI/body), Newsreader (display), JetBrains Mono (data/labels) */
+    --font-body: var(--font-hanken), "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+    --font-display: var(--font-newsreader), "Newsreader", Georgia, "Times New Roman", serif;
+    --font-mono: var(--font-jetbrains), "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
     /* FONT SIZE */
     --text-xs: calc(var(--spacing) * 3);
@@ -42,34 +42,34 @@
     --text-display-2xl--line-height: calc(var(--spacing) * 22.5);
     --text-display-2xl--letter-spacing: -1.44px;
 
-    /* MAX WIDTH */
-    --max-width-container: 1280px;
+    /* MAX WIDTH — Larza content ~1200px */
+    --max-width-container: 1200px;
 
     /* BREAKPOINTS */
     --breakpoint-xxs: 320px;
     /* This must match the breakpoint in Sonner: https://github.com/emilkowalski/sonner/blob/main/src/styles.css */
     --breakpoint-xs: 600px;
 
-    /* RADIUS */
+    /* RADIUS — Larza soft / generous */
     --radius-none: 0px;
-    --radius-xs: 0.125rem;
-    --radius-sm: 0.25rem;
-    --radius-DEFAULT: 0.25rem;
-    --radius-md: 0.375rem;
-    --radius-lg: 0.5rem;
-    --radius-xl: 0.75rem;
-    --radius-2xl: 1rem;
-    --radius-3xl: 1.5rem;
+    --radius-xs: 0.25rem; /* 4px */
+    --radius-sm: 0.5rem; /* 8px */
+    --radius-DEFAULT: 0.5rem;
+    --radius-md: 0.75rem; /* 12px */
+    --radius-lg: 1rem; /* 16px */
+    --radius-xl: 1.5rem; /* 24px */
+    --radius-2xl: 2rem; /* 32px */
+    --radius-3xl: 2rem;
     --radius-full: 9999px;
 
-    /* SHADOW */
-    --shadow-xs: 0px 1px 2px rgba(0, 0, 0, 0.05);
-    --shadow-sm: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 1px 2px -1px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0px 12px 16px -4px rgba(0, 0, 0, 0.08), 0px 4px 6px -2px rgba(0, 0, 0, 0.03), 0px 2px 2px -1px rgba(0, 0, 0, 0.04);
-    --shadow-xl: 0px 20px 24px -4px rgba(0, 0, 0, 0.08), 0px 8px 8px -4px rgba(0, 0, 0, 0.03), 0px 3px 3px -1.5px rgba(0, 0, 0, 0.04);
-    --shadow-2xl: 0px 24px 48px -12px rgba(0, 0, 0, 0.18), 0px 4px 4px -2px rgba(0, 0, 0, 0.04);
-    --shadow-3xl: 0px 32px 64px -12px rgba(0, 0, 0, 0.14), 0px 5px 5px -2.5px rgba(0, 0, 0, 0.04);
+    /* SHADOW — warm-tinted (ink-900), soft layered */
+    --shadow-xs: 0 1px 2px rgba(28, 25, 21, 0.05);
+    --shadow-sm: 0 1px 2px rgba(28, 25, 21, 0.04), 0 2px 6px rgba(28, 25, 21, 0.05);
+    --shadow-md: 0 2px 4px rgba(28, 25, 21, 0.04), 0 6px 16px rgba(28, 25, 21, 0.07);
+    --shadow-lg: 0 4px 8px rgba(28, 25, 21, 0.05), 0 14px 32px rgba(28, 25, 21, 0.09);
+    --shadow-xl: 0 8px 16px rgba(28, 25, 21, 0.06), 0 24px 56px rgba(28, 25, 21, 0.12);
+    --shadow-2xl: 0 8px 16px rgba(28, 25, 21, 0.06), 0 24px 56px rgba(28, 25, 21, 0.12);
+    --shadow-3xl: 0 8px 16px rgba(28, 25, 21, 0.06), 0 24px 56px rgba(28, 25, 21, 0.12);
 
     --shadow-skeuomorphic: 0px 0px 0px 1px rgba(0, 0, 0, 0.18) inset, 0px -2px 0px 0px rgba(0, 0, 0, 0.05) inset;
     --shadow-xs-skeuomorphic: var(--shadow-skeuomorphic), var(--shadow-xs);
@@ -121,17 +121,81 @@
     --color-alpha-white: rgb(255 255 255);
     --color-alpha-black: rgb(0 0 0);
 
-    --color-brand-50: rgb(249 245 255);
-    --color-brand-100: rgb(244 235 255);
-    --color-brand-200: rgb(233 215 254);
-    --color-brand-300: rgb(214 187 251);
-    --color-brand-400: rgb(182 146 246);
-    --color-brand-500: rgb(158 119 237);
-    --color-brand-600: rgb(127 86 217);
-    --color-brand-700: rgb(105 65 198);
-    --color-brand-800: rgb(83 56 158);
-    --color-brand-900: rgb(66 48 125);
-    --color-brand-950: rgb(44 28 95);
+    /* BRAND · Clay (Larza terracotta) */
+    --color-brand-50: #fbf2ec;
+    --color-brand-100: #f5e1d4;
+    --color-brand-200: #ebc4ac;
+    --color-brand-300: #dda283;
+    --color-brand-400: #ce805c;
+    --color-brand-500: #c1653f;
+    --color-brand-600: #a6512f;
+    --color-brand-700: #843f26;
+    --color-brand-800: #613020;
+    --color-brand-900: #45231a;
+    --color-brand-950: #2c1710;
+
+    /* NEUTRALS · Warm ink + sand (override Tailwind defaults) */
+    --color-neutral-25: #fbf8f3;
+    --color-neutral-50: #fbf8f3; /* sand-50 — page */
+    --color-neutral-100: #f5efe6; /* sand-100 */
+    --color-neutral-200: #e0dacf; /* ink-200 */
+    --color-neutral-300: #c6beb0; /* ink-300 */
+    --color-neutral-400: #a39a8a; /* ink-400 */
+    --color-neutral-500: #7c7466; /* ink-500 */
+    --color-neutral-600: #5c554a; /* ink-600 */
+    --color-neutral-700: #423d35; /* ink-700 */
+    --color-neutral-800: #2c2823; /* ink-800 */
+    --color-neutral-900: #1c1915; /* ink-900 */
+    --color-neutral-950: #14110e;
+
+    /* SEMANTIC BASE SCALES — muted / desaturated Larza */
+    --color-green-50: #e4ebe0;
+    --color-green-100: #e4ebe0;
+    --color-green-200: #c8d6c0;
+    --color-green-300: #9bb38c;
+    --color-green-400: #849f72;
+    --color-green-500: #6e8b5e; /* sage */
+    --color-green-600: #5c754e;
+    --color-green-700: #4c6440;
+    --color-green-800: #3a4d31;
+    --color-green-900: #2a3724;
+    --color-green-950: #1a2317;
+
+    --color-yellow-50: #f6e9cf;
+    --color-yellow-100: #f6e9cf;
+    --color-yellow-200: #ebd4a3;
+    --color-yellow-300: #dbb96a;
+    --color-yellow-400: #d0a447;
+    --color-yellow-500: #c7912e; /* amber */
+    --color-yellow-600: #a87822;
+    --color-yellow-700: #8f6614;
+    --color-yellow-800: #6d4e10;
+    --color-yellow-900: #4d370b;
+    --color-yellow-950: #2e2107;
+
+    --color-red-50: #f3dcd5;
+    --color-red-100: #f3dcd5;
+    --color-red-200: #e5b5a8;
+    --color-red-300: #d08572;
+    --color-red-400: #c26852;
+    --color-red-500: #b4513c; /* rust */
+    --color-red-600: #9a4433;
+    --color-red-700: #843425;
+    --color-red-800: #64281c;
+    --color-red-900: #461c14;
+    --color-red-950: #2a110c;
+
+    --color-blue-50: #dee7ec;
+    --color-blue-100: #dee7ec;
+    --color-blue-200: #b8c9d4;
+    --color-blue-300: #8aa6b6;
+    --color-blue-400: #6e91a3;
+    --color-blue-500: #5b7c90; /* sky */
+    --color-blue-600: #4a6678;
+    --color-blue-700: #3c5666;
+    --color-blue-800: #2e4250;
+    --color-blue-900: #212f39;
+    --color-blue-950: #141c22;
 
     /* LIGHT MODE VARIABLES */
 
@@ -305,10 +369,10 @@
     --color-text-editor-icon-fg_active: var(--color-neutral-500);
     --color-text-quaternary: var(--color-neutral-500);
     --color-text-brand-primary: var(--color-brand-900);
-    --color-text-primary_on-brand: var(--color-white);
-    --color-text-secondary_on-brand: var(--color-brand-200);
-    --color-text-tertiary_on-brand: var(--color-brand-200);
-    --color-text-quaternary_on-brand: var(--color-brand-300);
+    --color-text-primary_on-brand: var(--color-neutral-50);
+    --color-text-secondary_on-brand: var(--color-brand-100);
+    --color-text-tertiary_on-brand: var(--color-brand-100);
+    --color-text-quaternary_on-brand: var(--color-brand-200);
     --color-text-brand-tertiary_alt: var(--color-brand-600);
     --color-text-error-primary_hover: var(--color-red-700);
     --color-text-brand-secondary_hover: var(--color-brand-800);
@@ -353,15 +417,15 @@
     --color-bg-warning-secondary: var(--color-yellow-100);
     --color-bg-success-primary: var(--color-green-50);
     --color-bg-success-secondary: var(--color-green-100);
-    --color-bg-brand-solid: var(--color-brand-600);
+    --color-bg-brand-solid: var(--color-brand-500);
     --color-bg-secondary-solid: var(--color-neutral-600);
-    --color-bg-error-solid: var(--color-red-600);
-    --color-bg-warning-solid: var(--color-yellow-600);
-    --color-bg-success-solid: var(--color-green-600);
+    --color-bg-error-solid: var(--color-red-500);
+    --color-bg-warning-solid: var(--color-yellow-500);
+    --color-bg-success-solid: var(--color-green-500);
     --color-bg-secondary_hover: var(--color-neutral-100);
     --color-bg-primary_hover: var(--color-neutral-50);
     --color-bg-active: var(--color-neutral-50);
-    --color-bg-brand-solid_hover: var(--color-brand-700);
+    --color-bg-brand-solid_hover: var(--color-brand-600);
     --color-bg-error-primary: var(--color-red-50);
     --color-bg-brand-secondary: var(--color-brand-100);
     --color-bg-secondary: var(--color-neutral-50);

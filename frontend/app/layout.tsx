@@ -1,18 +1,30 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Hanken_Grotesk, JetBrains_Mono, Newsreader } from "next/font/google";
 import { RouteProvider } from "@/providers/route-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import "@/styles/globals.css";
 
-const inter = Inter({
+const hanken = Hanken_Grotesk({
     subsets: ["latin"],
     display: "swap",
-    variable: "--font-inter",
+    variable: "--font-hanken",
+});
+
+const newsreader = Newsreader({
+    subsets: ["latin"],
+    display: "swap",
+    variable: "--font-newsreader",
+});
+
+const jetbrains = JetBrains_Mono({
+    subsets: ["latin"],
+    display: "swap",
+    variable: "--font-jetbrains",
 });
 
 export const metadata: Metadata = {
-    title: "MVP Scaffold",
-    description: "One-click scaffold with Untitled UI",
+    title: "Larza",
+    description: "Personalized preventative care",
 };
 
 export const viewport: Viewport = {
@@ -21,8 +33,12 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
-        <html lang="en" className={`${inter.variable} scroll-smooth`} suppressHydrationWarning>
-            <body className="bg-primary text-primary antialiased">
+        <html
+            lang="en"
+            className={`${hanken.variable} ${newsreader.variable} ${jetbrains.variable} scroll-smooth`}
+            suppressHydrationWarning
+        >
+            <body className="bg-secondary font-body text-primary antialiased">
                 <RouteProvider>
                     <ThemeProvider>{children}</ThemeProvider>
                 </RouteProvider>
