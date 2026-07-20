@@ -1,6 +1,5 @@
-import { ArrowRight } from "@untitledui/icons";
 import { Badge } from "@/components/base/badges/badges";
-import { Button } from "@/components/base/buttons/button";
+import { WelcomeActions } from "@/components/landing/welcome-actions";
 import { getServerBackendClient } from "@/generated/backend/client";
 
 async function getHello() {
@@ -40,14 +39,7 @@ export default async function Page() {
                     </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
-                    <Button color="primary" size="lg" href="/showcase" iconTrailing={ArrowRight}>
-                        Browse components
-                    </Button>
-                    <Button color="secondary" size="lg" href="https://www.untitledui.com/react" target="_blank">
-                        Untitled UI docs
-                    </Button>
-                </div>
+                <WelcomeActions />
             </div>
         </main>
     );
