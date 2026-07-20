@@ -30,6 +30,9 @@ services:
       PORT: 3001
       DATABASE_URL: postgres://app:dev@db:5432/app
       FRONTEND_ORIGIN: http://localhost:3000
+      # Dev-only secret; replace in real deployments.
+      BETTER_AUTH_SECRET: 2hkee/0PTQo7QHLQsAJ7F+WQxnP6qzXF+Tbk4daNRGo=
+      BETTER_AUTH_URL: http://localhost:3001
     ports:
       - "3001:3001"
       - "4983:4983"

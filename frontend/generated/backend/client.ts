@@ -4,7 +4,7 @@ import type { paths } from './schema'
 const DEFAULT_BASE_URL = 'http://localhost:3001'
 
 export function createBackendClient(baseUrl: string) {
-  return createClient<paths>({ baseUrl })
+  return createClient<paths>({ baseUrl, credentials: 'include' })
 }
 
 /** Server Components / Route Handlers — prefer the Docker/private network URL. */

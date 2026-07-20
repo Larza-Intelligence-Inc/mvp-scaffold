@@ -8,7 +8,7 @@ Full-stack scaffold: **Next.js** (web) + **Hono** (api) + **PostgreSQL** (db), o
 | **backend** | Hono + Zod OpenAPI | Backend — REST API with auto-generated Swagger docs |
 | **db** | PostgreSQL 17 | Database — accessed via Drizzle ORM |
 
-The demo includes a `users` table and CRUD endpoints (`GET/POST /api/users`), plus a hello endpoint the frontend displays. Source is bind-mounted into containers for hot reload.
+The demo includes Better Auth (email/password + organizations), a hello endpoint the frontend displays, and `GET /api/me` for the current session. Source is bind-mounted into containers for hot reload.
 
 ---
 
@@ -40,7 +40,8 @@ docker compose exec backend npm run db:push
 
 1. Open http://localhost:3000 — you should see "API says: Hello from the Hono API 👋"
 2. Open http://localhost:3001/ui — Swagger UI
-3. In Swagger, try `POST /api/users` with `{ "email": "ada@example.com", "name": "Ada" }`, then `GET /api/users`
+3. Sign up at http://localhost:3000/sign-up, then open `/dashboard` to create an organization
+4. Call `GET /api/me` (with session cookie) to verify auth
 
 > You do not need to copy `.env.example` for local Docker dev — `docker-compose.yml` injects the env vars. `.env.example` documents the contract for non-Docker or production deployments.
 
@@ -56,7 +57,9 @@ docker compose exec backend npm run db:push
 | **OpenAPI lockfile** | `backend/openapi.json` | Committed artifact used for frontend codegen |
 | **Health check** | http://localhost:3001/health | `{ "status": "ok" }` |
 | **Hello endpoint** | http://localhost:3001/api/hello | Used by the frontend |
-| **List users** | http://localhost:3001/api/users | Empty until you POST one |
+| **Auth** | http://localhost:3001/api/auth/* | Better Auth (sign-up, session, orgs) |
+| **Current user** | http://localhost:3001/api/me | Requires session cookie |
+| **Sign up / Login** | http://localhost:3000/sign-up · /login | Untitled UI auth pages |
 | **Drizzle Studio** | https://local.drizzle.studio | DB GUI — only after running `db:studio` (see below) |
 | **Postgres** | `localhost:5432` | User: `app`, Password: `dev`, Database: `app` |
 

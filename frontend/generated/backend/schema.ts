@@ -78,7 +78,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/users": {
+    "/api/me": {
         parameters: {
             query?: never;
             header?: never;
@@ -94,17 +94,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description List of users */
+                /** @description Current user session */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["User"][];
+                        "application/json": components["schemas"]["MeResponse"];
                     };
                 };
-                /** @description DB not ready */
-                500: {
+                /** @description Not authenticated */
+                401: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -115,39 +115,7 @@ export interface paths {
             };
         };
         put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["NewUser"];
-                };
-            };
-            responses: {
-                /** @description Created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["User"];
-                    };
-                };
-                /** @description Insert failed */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -158,30 +126,27 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        User: {
-            /** @example 1 */
-            id: number;
-            /**
-             * Format: email
-             * @example ada@example.com
-             */
+        MeUser: {
+            id: string;
+            name: string;
+            /** Format: email */
             email: string;
-            /** @example Ada Lovelace */
-            name: string | null;
-            /** @example 2026-01-01T00:00:00.000Z */
+            image?: string | null;
             createdAt: string;
+            updatedAt: string;
+        };
+        MeSession: {
+            id: string;
+            userId: string;
+            expiresAt: string;
+            activeOrganizationId?: string | null;
+        };
+        MeResponse: {
+            user: components["schemas"]["MeUser"];
+            session: components["schemas"]["MeSession"];
         };
         Error: {
             error: string;
-        };
-        NewUser: {
-            /**
-             * Format: email
-             * @example ada@example.com
-             */
-            email: string;
-            /** @example Ada Lovelace */
-            name?: string;
         };
     };
     responses: never;

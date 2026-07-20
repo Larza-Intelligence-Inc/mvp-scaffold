@@ -11,33 +11,74 @@
   ],
   "components": {
     "schemas": {
-      "User": {
+      "MeUser": {
         "type": "object",
         "properties": {
           "id": {
-            "type": "number",
-            "example": 1
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
           },
           "email": {
             "type": "string",
-            "format": "email",
-            "example": "ada@example.com"
+            "format": "email"
           },
-          "name": {
+          "image": {
             "type": "string",
-            "nullable": true,
-            "example": "Ada Lovelace"
+            "nullable": true
           },
           "createdAt": {
-            "type": "string",
-            "example": "2026-01-01T00:00:00.000Z"
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
           }
         },
         "required": [
           "id",
-          "email",
           "name",
-          "createdAt"
+          "email",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "MeSession": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string"
+          },
+          "activeOrganizationId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "expiresAt"
+        ]
+      },
+      "MeResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/MeUser"
+          },
+          "session": {
+            "$ref": "#/components/schemas/MeSession"
+          }
+        },
+        "required": [
+          "user",
+          "session"
         ]
       },
       "Error": {
@@ -49,23 +90,6 @@
         },
         "required": [
           "error"
-        ]
-      },
-      "NewUser": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "format": "email",
-            "example": "ada@example.com"
-          },
-          "name": {
-            "type": "string",
-            "example": "Ada Lovelace"
-          }
-        },
-        "required": [
-          "email"
         ]
       }
     },
@@ -120,57 +144,21 @@
         }
       }
     },
-    "/api/users": {
+    "/api/me": {
       "get": {
         "responses": {
           "200": {
-            "description": "List of users",
+            "description": "Current user session",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/User"
-                  }
+                  "$ref": "#/components/schemas/MeResponse"
                 }
               }
             }
           },
-          "500": {
-            "description": "DB not ready",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewUser"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Insert failed",
+          "401": {
+            "description": "Not authenticated",
             "content": {
               "application/json": {
                 "schema": {

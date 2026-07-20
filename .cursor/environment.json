@@ -6,7 +6,7 @@
     {
       "name": "backend",
       "description": "Wait for Postgres, sync Drizzle schema (db:push), then run the Hono API on :3001",
-      "command": "until pg_isready -h localhost -q; do sleep 0.5; done; DATABASE_URL=\"postgres://app:dev@localhost:5432/app\" npm run db:push --prefix backend && PORT=3001 DATABASE_URL=\"postgres://app:dev@localhost:5432/app\" FRONTEND_ORIGIN=\"http://localhost:3000\" npm run dev --prefix backend"
+      "command": "until pg_isready -h localhost -q; do sleep 0.5; done; DATABASE_URL=\"postgres://app:dev@localhost:5432/app\" npm run db:push --prefix backend && PORT=3001 DATABASE_URL=\"postgres://app:dev@localhost:5432/app\" FRONTEND_ORIGIN=\"http://localhost:3000\" BETTER_AUTH_SECRET=\"2hkee/0PTQo7QHLQsAJ7F+WQxnP6qzXF+Tbk4daNRGo=\" BETTER_AUTH_URL=\"http://localhost:3001\" npm run dev --prefix backend"
     },
     {
       "name": "frontend",

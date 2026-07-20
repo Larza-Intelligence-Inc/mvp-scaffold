@@ -27,11 +27,14 @@ export function WelcomeHero({ apiMessage }: { apiMessage: string }) {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-                <Button color="primary" size="lg" href="/showcase" iconTrailing={ArrowRight}>
-                    Browse components
+                <Button color="primary" size="lg" href="/sign-up" iconTrailing={ArrowRight}>
+                    Sign up
                 </Button>
-                <Button color="secondary" size="lg" href="https://www.untitledui.com/react" target="_blank">
-                    Untitled UI docs
+                <Button color="secondary" size="lg" href="/login">
+                    Log in
+                </Button>
+                <Button color="tertiary" size="lg" href="/showcase">
+                    Browse components
                 </Button>
             </div>
         </div>
