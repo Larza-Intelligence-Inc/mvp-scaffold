@@ -39,6 +39,23 @@ function LoginForm() {
         router.refresh();
     }
 
+    async function onPasskeySignIn() {
+        setError(null);
+        setLoading(true);
+        const { error: passkeyError } = await authClient.signIn.passkey({
+            fetchOptions: {
+                // Ensure session cookie lands for the proxied same-origin path.
+            },
+        });
+        setLoading(false);
+        if (passkeyError) {
+            setError(passkeyError.message ?? "Passkey sign-in failed");
+            return;
+        }
+        router.push(nextPath);
+        router.refresh();
+    }
+
     return (
         <div className="flex flex-col gap-8">
             <div className="flex flex-col gap-2">
@@ -80,6 +97,22 @@ function LoginForm() {
                     Log in
                 </Button>
             </form>
+
+            <div className="flex items-center gap-3">
+                <div className="h-px flex-1 border-t border-secondary" />
+                <span className="text-sm text-tertiary">or</span>
+                <div className="h-px flex-1 border-t border-secondary" />
+            </div>
+
+            <Button
+                color="secondary"
+                size="lg"
+                className="w-full"
+                isDisabled={loading}
+                onPress={() => void onPasskeySignIn()}
+            >
+                Sign in with passkey
+            </Button>
         </div>
     );
 }
