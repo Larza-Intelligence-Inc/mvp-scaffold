@@ -171,10 +171,28 @@ Or ask the agent to run the **generate-frontend-sdk** skill (same two steps; nev
 | `backend/openapi.json` | API lockfile (`servers: [{ url: '/' }]` — origin comes from the client) |
 | `frontend/generated/backend/schema.ts` | Generated types (`openapi-typescript`) |
 | `frontend/generated/backend/client.ts` | Hand-written `openapi-fetch` client; `baseUrl` from env |
-| `BACKEND_URL_INTERNAL` | Server-side base URL (e.g. `http://backend:3001` in Docker) |
-| `NEXT_PUBLIC_API_URL` | Browser base URL (e.g. `http://localhost:3001`) |
+| `BACKEND_URL_INTERNAL` | Server-side base URL (e.g. `http://backend:3001` in Docker). Browser `/api/*` calls are proxied here via `next.config.js` rewrites — no public API URL is baked into the build. |
 
 Runtime `/openapi.json` and `/ui` remain available for local exploration; codegen does not use them.
+
+---
+
+## Environment variables
+
+App code only ever reads named vars (never hardcodes URLs), and cross-service URLs are **derived**, not typed by hand:
+
+- **Browser → API:** the browser calls `/api/*` on its **own origin**; `frontend/next.config.js` rewrites proxy those to `BACKEND_URL_INTERNAL` server-side. There is no `NEXT_PUBLIC_*` API URL, so one frontend build runs unchanged in local, cloud, PR, staging and prod.
+- **Local (Docker):** values come from `docker-compose.yml` service DNS (e.g. `http://backend:3001`).
+- **Railway (all environments, including PR):** cross-service values use **reference variables** so they re-resolve automatically per environment (PR envs get their own generated domains with zero manual edits):
+
+| Service | Variable | Value (Railway reference) |
+|---------|----------|---------------------------|
+| backend | `DATABASE_URL` | `${{Postgres.DATABASE_URL}}` |
+| backend | `BETTER_AUTH_URL` | `https://${{backend.RAILWAY_PUBLIC_DOMAIN}}` |
+| backend | `FRONTEND_ORIGIN` | `https://${{frontend.RAILWAY_PUBLIC_DOMAIN}}` |
+| frontend | `BACKEND_URL_INTERNAL` | `http://${{backend.RAILWAY_PRIVATE_DOMAIN}}:3001` |
+
+Set/verify these with the Railway CLI, e.g. `railway variable set 'DATABASE_URL=${{Postgres.DATABASE_URL}}' --service backend --environment staging` and `railway variables --service backend --environment staging --kv`.
 
 ---
 

@@ -48,8 +48,8 @@ services:
     depends_on:
       - backend
     environment:
+      # Browser calls `/api/*` same-origin; Next proxies to this internal URL.
       BACKEND_URL_INTERNAL: http://backend:3001
-      NEXT_PUBLIC_API_URL: http://localhost:3001
     ports:
       - "3000:3000"
     volumes:

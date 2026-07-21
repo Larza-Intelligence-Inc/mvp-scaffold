@@ -11,7 +11,7 @@
     {
       "name": "frontend",
       "description": "Next.js app on :3000 (API via localhost:3001)",
-      "command": "BACKEND_URL_INTERNAL=\"http://localhost:3001\" NEXT_PUBLIC_API_URL=\"http://localhost:3001\" npm run dev --prefix frontend"
+      "command": "BACKEND_URL_INTERNAL=\"http://localhost:3001\" npm run dev --prefix frontend"
     }
   ],
   "ports": [

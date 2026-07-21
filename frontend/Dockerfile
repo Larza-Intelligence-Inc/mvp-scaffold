@@ -4,10 +4,9 @@ WORKDIR /app
 COPY package.json ./
 RUN npm install
 COPY . .
-# NEXT_PUBLIC_* vars are inlined at BUILD time. If you add browser-side API calls,
-# set NEXT_PUBLIC_API_URL in Railway and it is passed in as this build arg.
-ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+# The browser only calls `/api/*` on its own origin (proxied to the backend via
+# next.config.js rewrites using the runtime BACKEND_URL_INTERNAL), so there is no
+# build-time API URL to inline. This image is environment-agnostic.
 RUN npm run build
 
 FROM node:22-alpine AS runner

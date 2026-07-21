@@ -18,7 +18,7 @@ Cloud boot is configured in `.cursor/environment.json`: `install` refreshes deps
 - No JS lint config exists; typecheck with `npx tsc --noEmit`.
 
 ### Frontend (`frontend/`)
-- Dev server (also started by the `frontend` terminal): `BACKEND_URL_INTERNAL="http://localhost:3001" NEXT_PUBLIC_API_URL="http://localhost:3001" npm run dev --prefix frontend`. Serves on `:3000`. The home page is a server component that fetches `/api/hello` from `BACKEND_URL_INTERNAL` — point it at `localhost:3001` (not the Docker hostname `backend`).
+- Dev server (also started by the `frontend` terminal): `BACKEND_URL_INTERNAL="http://localhost:3001" npm run dev --prefix frontend`. Serves on `:3000`. The browser calls `/api/*` on the frontend origin; `next.config.js` rewrites proxy those to `BACKEND_URL_INTERNAL` server-side (point it at `localhost:3001`, not the Docker hostname `backend`). Server components also fetch `/api/hello` from `BACKEND_URL_INTERNAL`.
 
 ### Python Railway setup tool (`scripts/railway/`)
 - Installed into `.venv` (editable). Run unit tests: `.venv/bin/pytest scripts/railway/tests/ -m "not integration"`. Integration tests need a live Railway API token and are skipped by default.

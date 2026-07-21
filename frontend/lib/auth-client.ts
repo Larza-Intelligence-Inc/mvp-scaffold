@@ -1,10 +1,10 @@
 import { createAuthClient } from 'better-auth/react'
 import { organizationClient } from 'better-auth/client/plugins'
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'
-
+// No baseURL: the client infers the current origin in the browser and calls
+// `/api/auth/*`, which the Next.js rewrite proxies to the backend. Frontend and
+// API are same-origin from the browser's perspective, so cookies just work.
 export const authClient = createAuthClient({
-  baseURL,
   plugins: [organizationClient()],
 })
 
@@ -12,5 +12,5 @@ export function appOrigin() {
   if (typeof window !== 'undefined') {
     return window.location.origin
   }
-  return process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+  return ''
 }
