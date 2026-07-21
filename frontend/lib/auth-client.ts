@@ -1,5 +1,5 @@
 import { createAuthClient } from 'better-auth/react'
-import { organizationClient } from 'better-auth/client/plugins'
+import { magicLinkClient, organizationClient } from 'better-auth/client/plugins'
 import { passkeyClient } from '@better-auth/passkey/client'
 import { ac, roles } from '@/lib/auth-permissions'
 
@@ -14,6 +14,7 @@ export const authClient = createAuthClient({
       teams: { enabled: true },
       dynamicAccessControl: { enabled: true },
     }),
+    magicLinkClient(),
     passkeyClient(),
   ],
 })
@@ -23,4 +24,10 @@ export function appOrigin() {
     return window.location.origin
   }
   return ''
+}
+
+/** Safe relative next-path from `?next=` query params. */
+export function safeNextPath(raw: string | null): string {
+  if (!raw || !raw.startsWith('/') || raw.startsWith('//')) return '/dashboard'
+  return raw
 }

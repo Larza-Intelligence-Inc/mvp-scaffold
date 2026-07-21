@@ -11,12 +11,13 @@ import { app } from './app'
 
 test('POST /api/send sends a basic email via Resend', async () => {
   assert.ok(process.env.RESEND_API_KEY, 'RESEND_API_KEY must be set for this e2e test')
+  const to = process.env.AUTH_EMAIL_TEST_TO ?? 'vihar@larza.ai'
 
   const res = await app.request('/api/send', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      to: 'delivered@resend.dev',
+      to,
       subject: 'Hello from Resend!',
       message: "Welcome! This email was sent using Resend's Node.js SDK.",
     }),

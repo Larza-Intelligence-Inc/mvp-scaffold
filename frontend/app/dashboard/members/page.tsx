@@ -148,7 +148,11 @@ export default function MembersPage() {
             setLastInviteLink(`${appOrigin()}/accept-invitation/${invitationId}`);
         }
         setInviteEmail("");
-        setMessage("Invitation created — share the link below (no email provider configured).");
+        setMessage(
+            invitationId
+                ? "Invitation email sent. A backup link is available below if the recipient needs it."
+                : "Invitation email sent.",
+        );
         await refresh();
     }
 
