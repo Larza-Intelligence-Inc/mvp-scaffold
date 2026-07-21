@@ -122,6 +122,72 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SendEmailBody"];
+                };
+            };
+            responses: {
+                /** @description Email accepted by Resend */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SendEmailResponse"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Send failed */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Resend not configured */
+                503: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -140,6 +206,7 @@ export interface components {
             userId: string;
             expiresAt: string;
             activeOrganizationId?: string | null;
+            activeTeamId?: string | null;
         };
         MeResponse: {
             user: components["schemas"]["MeUser"];
@@ -147,6 +214,17 @@ export interface components {
         };
         Error: {
             error: string;
+        };
+        SendEmailResponse: {
+            /** @enum {boolean} */
+            success: true;
+            id?: string;
+        };
+        SendEmailBody: {
+            /** Format: email */
+            to: string;
+            subject: string;
+            message: string;
         };
     };
     responses: never;

@@ -1,59 +1,67 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { AuthSplitLayout } from "@/components/application/auth-split-layout";
 import { Button } from "@/components/base/buttons/button";
 import { Input } from "@/components/base/input/input";
 import { appOrigin, authClient, safeNextPath } from "@/lib/auth-client";
 
-function SignUpForm() {
-    const router = useRouter();
+function ForgotPasswordForm() {
     const searchParams = useSearchParams();
     const nextPath = safeNextPath(searchParams.get("next"));
-    const [name, setName] = useState("");
     const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
+    const [sent, setSent] = useState(false);
     const [loading, setLoading] = useState(false);
 
     async function onSubmit(e: React.FormEvent) {
         e.preventDefault();
         setError(null);
         setLoading(true);
-        const { error: signUpError } = await authClient.signUp.email({
-            name,
+        const { error: resetError } = await authClient.requestPasswordReset({
             email,
-            password,
-            callbackURL: `${appOrigin()}${nextPath}`,
+            redirectTo: `${appOrigin()}/reset-password`,
         });
         setLoading(false);
-        if (signUpError) {
-            setError(signUpError.message ?? "Sign up failed");
+        if (resetError) {
+            setError(resetError.message ?? "Could not send reset email");
             return;
         }
-        // Email verification is required — no session until the user confirms.
-        const params = new URLSearchParams({ email });
-        if (nextPath !== "/dashboard") params.set("next", nextPath);
-        router.push(`/check-email?${params.toString()}`);
+        setSent(true);
     }
 
-    const nextQuery = nextPath !== "/dashboard" ? `?next=${encodeURIComponent(nextPath)}` : "";
+    if (sent) {
+        return (
+            <div className="flex flex-col gap-4">
+                <h1 className="font-display text-display-xs font-medium tracking-tight text-primary">Check your email</h1>
+                <p className="text-md text-tertiary">
+                    If an account exists for <span className="font-medium text-primary">{email}</span>, we sent a password
+                    reset link. It expires in about an hour.
+                </p>
+                <a className="font-medium text-brand-secondary hover:underline" href="/login">
+                    Back to log in
+                </a>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col gap-8">
             <div className="flex flex-col gap-2">
-                <h1 className="font-display text-display-xs font-medium tracking-tight text-primary">Create account</h1>
+                <h1 className="font-display text-display-xs font-medium tracking-tight text-primary">Forgot password</h1>
                 <p className="text-md text-tertiary">
-                    Already have an account?{" "}
-                    <a className="font-medium text-brand-secondary hover:underline" href={`/login${nextQuery}`}>
-                        Log in
+                    Enter your email and we&apos;ll send a reset link.{" "}
+                    <a
+                        className="font-medium text-brand-secondary hover:underline"
+                        href={nextPath !== "/dashboard" ? `/login?next=${encodeURIComponent(nextPath)}` : "/login"}
+                    >
+                        Back to log in
                     </a>
                 </p>
             </div>
 
             <form className="flex flex-col gap-5" onSubmit={onSubmit}>
-                <Input isRequired label="Name" name="name" value={name} onChange={setName} placeholder="Ada Lovelace" size="md" />
                 <Input
                     isRequired
                     label="Email"
@@ -64,34 +72,23 @@ function SignUpForm() {
                     placeholder="ada@example.com"
                     size="md"
                 />
-                <Input
-                    isRequired
-                    label="Password"
-                    name="password"
-                    type="password"
-                    value={password}
-                    onChange={setPassword}
-                    placeholder="••••••••"
-                    hint="At least 8 characters"
-                    size="md"
-                />
                 {error ? <p className="text-sm text-error-primary">{error}</p> : null}
                 <Button type="submit" color="primary" size="lg" className="w-full" isDisabled={loading} isLoading={loading}>
-                    Sign up
+                    Send reset link
                 </Button>
             </form>
         </div>
     );
 }
 
-export default function SignUpPage() {
+export default function ForgotPasswordPage() {
     return (
         <AuthSplitLayout
-            panelTitle="Start with a clearer picture."
-            panelSubtitle="Join Larza and keep your care team aligned from day one."
+            panelTitle="Get back in securely."
+            panelSubtitle="We'll email you a one-time link to choose a new password."
         >
             <Suspense fallback={<p className="text-md text-tertiary">Loading…</p>}>
-                <SignUpForm />
+                <ForgotPasswordForm />
             </Suspense>
         </AuthSplitLayout>
     );
