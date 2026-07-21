@@ -1,11 +1,26 @@
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from '@better-auth/drizzle-adapter'
 import { organization } from 'better-auth/plugins'
+import { passkey } from '@better-auth/passkey'
 import { db } from './db/client'
 import * as schema from './db/schema'
+import { ac, roles } from './auth/permissions'
 
 const frontendOrigin = process.env.FRONTEND_ORIGIN ?? 'http://localhost:3000'
 const betterAuthUrl = process.env.BETTER_AUTH_URL ?? 'http://localhost:3001'
+
+function hostnameFromUrl(url: string, fallback: string): string {
+  try {
+    return new URL(url).hostname || fallback
+  } catch {
+    return fallback
+  }
+}
+
+// WebAuthn rpID must match the browser-visible host (frontend), not the internal API host.
+const passkeyRpID =
+  process.env.PASSKEY_RP_ID ?? hostnameFromUrl(frontendOrigin, 'localhost')
+const passkeyRpName = process.env.PASSKEY_RP_NAME ?? 'Larza'
 
 // Railway `*.up.railway.app` is on the Public Suffix List, so the frontend and
 // backend hosts are cross-site. SameSite=Lax cookies from the API are not stored
@@ -41,15 +56,35 @@ export const auth = betterAuth({
     : {}),
   plugins: [
     organization({
+      ac,
+      roles,
       allowUserToCreateOrganization: true,
+      invitationExpiresIn: 60 * 60 * 24 * 7,
+      teams: {
+        enabled: true,
+        maximumTeams: 20,
+        maximumMembersPerTeam: 50,
+        allowRemovingAllTeams: false,
+      },
+      dynamicAccessControl: {
+        enabled: true,
+        maximumRolesPerOrganization: 25,
+      },
       async sendInvitationEmail(data) {
         const inviteLink = `${frontendOrigin}/accept-invitation/${data.id}`
+        // No email provider yet — log so invites still work via copy-link UX.
         console.log('[better-auth] organization invitation', {
           email: data.email,
           organization: data.organization.name,
+          role: data.role,
           inviteLink,
         })
       },
+    }),
+    passkey({
+      rpID: passkeyRpID,
+      rpName: passkeyRpName,
+      origin: frontendOrigin,
     }),
   ],
 })

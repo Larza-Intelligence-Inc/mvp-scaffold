@@ -43,6 +43,7 @@ const MeSessionSchema = z
     userId: z.string(),
     expiresAt: z.string(),
     activeOrganizationId: z.string().nullable().optional(),
+    activeTeamId: z.string().nullable().optional(),
   })
   .openapi('MeSession')
 
@@ -107,6 +108,9 @@ app.openapi(
           userId: session.session.userId,
           expiresAt: session.session.expiresAt.toISOString(),
           activeOrganizationId: session.session.activeOrganizationId ?? null,
+          activeTeamId:
+            (session.session as { activeTeamId?: string | null }).activeTeamId ??
+            null,
         },
       },
       200,
