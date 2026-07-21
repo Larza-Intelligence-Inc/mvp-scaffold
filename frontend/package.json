@@ -8,6 +8,7 @@
     "generate:api": "openapi-typescript ../backend/openapi.json -o generated/backend/schema.ts"
   },
   "dependencies": {
+    "@better-auth/passkey": "^1.6.23",
     "@react-stately/utils": "^3.12.1",
     "@react-types/overlays": "^3.10.0",
     "@tailwindcss/typography": "^0.5.20",
