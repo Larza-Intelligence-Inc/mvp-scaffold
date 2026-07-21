@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/base/buttons/button";
 import { Input } from "@/components/base/input/input";
@@ -17,27 +17,57 @@ export default function OrganizationsPage() {
     const { data: session } = authClient.useSession();
     const [orgs, setOrgs] = useState<Org[]>([]);
     const [orgName, setOrgName] = useState("");
+    const [editName, setEditName] = useState("");
     const [message, setMessage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [busy, setBusy] = useState(false);
+    const [canUpdate, setCanUpdate] = useState(false);
+    const [canDelete, setCanDelete] = useState(false);
 
     const activeOrgId = session?.session.activeOrganizationId ?? null;
+    const activeOrg = orgs.find((o) => o.id === activeOrgId) ?? null;
 
-    async function refreshOrgs() {
+    const refreshOrgs = useCallback(async () => {
         const { data, error: listError } = await authClient.organization.list();
         if (listError) {
             setError(listError.message ?? "Could not load organizations");
             return;
         }
         setOrgs((data as Org[]) ?? []);
-    }
+    }, []);
+
+    const refreshPermissions = useCallback(async () => {
+        if (!activeOrgId) {
+            setCanUpdate(false);
+            setCanDelete(false);
+            return;
+        }
+        const [updateRes, deleteRes] = await Promise.all([
+            authClient.organization.hasPermission({
+                permissions: { organization: ["update"] },
+                organizationId: activeOrgId,
+            }),
+            authClient.organization.hasPermission({
+                permissions: { organization: ["delete"] },
+                organizationId: activeOrgId,
+            }),
+        ]);
+        setCanUpdate(Boolean(updateRes.data?.success));
+        setCanDelete(Boolean(deleteRes.data?.success));
+    }, [activeOrgId]);
 
     useEffect(() => {
         if (session) {
             void refreshOrgs();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [session?.user.id]);
+    }, [session?.user.id, refreshOrgs]);
+
+    useEffect(() => {
+        if (activeOrg) {
+            setEditName(activeOrg.name);
+        }
+        void refreshPermissions();
+    }, [activeOrg?.id, activeOrg?.name, refreshPermissions]);
 
     async function createOrganization(e: React.FormEvent) {
         e.preventDefault();
@@ -73,6 +103,69 @@ export default function OrganizationsPage() {
             return;
         }
         setMessage("Active organization updated");
+        router.refresh();
+    }
+
+    async function updateActiveOrg(e: React.FormEvent) {
+        e.preventDefault();
+        if (!activeOrgId) return;
+        setBusy(true);
+        setError(null);
+        setMessage(null);
+        const { error: updateError } = await authClient.organization.update({
+            organizationId: activeOrgId,
+            data: { name: editName.trim() },
+        });
+        setBusy(false);
+        if (updateError) {
+            setError(updateError.message ?? "Could not update organization");
+            return;
+        }
+        setMessage("Organization updated");
+        await refreshOrgs();
+    }
+
+    async function leaveActiveOrg() {
+        if (!activeOrgId) return;
+        if (!window.confirm("Leave this organization? You will lose access until re-invited.")) return;
+        setBusy(true);
+        setError(null);
+        setMessage(null);
+        const { error: leaveError } = await authClient.organization.leave({
+            organizationId: activeOrgId,
+        });
+        setBusy(false);
+        if (leaveError) {
+            setError(leaveError.message ?? "Could not leave organization");
+            return;
+        }
+        setMessage("You left the organization");
+        await refreshOrgs();
+        router.refresh();
+    }
+
+    async function deleteActiveOrg() {
+        if (!activeOrgId) return;
+        if (
+            !window.confirm(
+                "Delete this organization permanently? Members, invitations, and teams will be removed.",
+            )
+        ) {
+            return;
+        }
+        setBusy(true);
+        setError(null);
+        setMessage(null);
+        const { error: deleteError } = await authClient.organization.delete({
+            organizationId: activeOrgId,
+        });
+        setBusy(false);
+        if (deleteError) {
+            setError(deleteError.message ?? "Could not delete organization");
+            return;
+        }
+        setMessage("Organization deleted");
+        await refreshOrgs();
         router.refresh();
     }
 
@@ -131,6 +224,50 @@ export default function OrganizationsPage() {
                     </Button>
                 </form>
             </section>
+
+            {activeOrg ? (
+                <section className="flex flex-col gap-4 rounded-2xl bg-primary p-4 shadow-sm ring-1 ring-secondary sm:p-6">
+                    <div className="flex flex-col gap-1">
+                        <h2 className="font-display text-xl font-medium tracking-tight text-primary">Active organization</h2>
+                        <p className="text-sm text-tertiary">
+                            Manage <span className="font-medium text-primary">{activeOrg.name}</span> ({activeOrg.slug}).
+                        </p>
+                    </div>
+
+                    {canUpdate ? (
+                        <form className="flex flex-col gap-4 sm:flex-row sm:items-end" onSubmit={(e) => void updateActiveOrg(e)}>
+                            <Input
+                                isRequired
+                                label="Name"
+                                name="editName"
+                                value={editName}
+                                onChange={setEditName}
+                                className="flex-1"
+                            />
+                            <Button
+                                type="submit"
+                                color="secondary"
+                                size="md"
+                                isDisabled={busy || !editName.trim() || editName.trim() === activeOrg.name}
+                                isLoading={busy}
+                            >
+                                Save name
+                            </Button>
+                        </form>
+                    ) : null}
+
+                    <div className="flex flex-wrap gap-3">
+                        <Button color="secondary" size="md" isDisabled={busy} onPress={() => void leaveActiveOrg()}>
+                            Leave organization
+                        </Button>
+                        {canDelete ? (
+                            <Button color="primary-destructive" size="md" isDisabled={busy} onPress={() => void deleteActiveOrg()}>
+                                Delete organization
+                            </Button>
+                        ) : null}
+                    </div>
+                </section>
+            ) : null}
         </div>
     );
 }

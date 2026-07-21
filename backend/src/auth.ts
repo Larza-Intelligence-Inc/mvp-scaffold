@@ -3,6 +3,7 @@ import { drizzleAdapter } from '@better-auth/drizzle-adapter'
 import { organization } from 'better-auth/plugins'
 import { db } from './db/client'
 import * as schema from './db/schema'
+import { ac, roles } from './auth/permissions'
 
 const frontendOrigin = process.env.FRONTEND_ORIGIN ?? 'http://localhost:3000'
 const betterAuthUrl = process.env.BETTER_AUTH_URL ?? 'http://localhost:3001'
@@ -41,12 +42,27 @@ export const auth = betterAuth({
     : {}),
   plugins: [
     organization({
+      ac,
+      roles,
       allowUserToCreateOrganization: true,
+      invitationExpiresIn: 60 * 60 * 24 * 7,
+      teams: {
+        enabled: true,
+        maximumTeams: 20,
+        maximumMembersPerTeam: 50,
+        allowRemovingAllTeams: false,
+      },
+      dynamicAccessControl: {
+        enabled: true,
+        maximumRolesPerOrganization: 25,
+      },
       async sendInvitationEmail(data) {
         const inviteLink = `${frontendOrigin}/accept-invitation/${data.id}`
+        // No email provider yet — log so invites still work via copy-link UX.
         console.log('[better-auth] organization invitation', {
           email: data.email,
           organization: data.organization.name,
+          role: data.role,
           inviteLink,
         })
       },

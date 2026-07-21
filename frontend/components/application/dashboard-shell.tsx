@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Building07, HomeLine, Settings01, Users01 } from "@untitledui/icons";
+import { Building07, HomeLine, Lock01, Settings01, Users01, UsersPlus } from "@untitledui/icons";
 import { SidebarNavigationSimple } from "@/components/application/app-navigation/sidebar-navigation/sidebar-simple";
 import type { NavAccountType } from "@/components/application/app-navigation/base-components/nav-account-card";
 import { ThemeToggle } from "@/components/application/theme-toggle";
@@ -15,6 +15,8 @@ const navItems = [
     { label: "Home", href: "/dashboard", icon: HomeLine },
     { label: "Organizations", href: "/dashboard/organizations", icon: Building07 },
     { label: "Members", href: "/dashboard/members", icon: Users01 },
+    { label: "Teams", href: "/dashboard/teams", icon: UsersPlus },
+    { label: "Roles", href: "/dashboard/roles", icon: Lock01 },
     { label: "Settings", href: "/dashboard/settings", icon: Settings01 },
 ];
 
@@ -22,6 +24,8 @@ const titles: Record<string, string> = {
     "/dashboard": "Home",
     "/dashboard/organizations": "Organizations",
     "/dashboard/members": "Members",
+    "/dashboard/teams": "Teams",
+    "/dashboard/roles": "Roles & permissions",
     "/dashboard/settings": "Settings",
     "/dashboard/profile": "Profile",
 };
