@@ -5,12 +5,8 @@ module.exports = {
   // later. Not used by `next dev`, but it's what the production Dockerfile builds.
   output: 'standalone',
 
-  // Same-origin API proxy. The browser only ever calls `/api/*` on its OWN origin;
-  // Next forwards those requests server-side to the backend at BACKEND_URL_INTERNAL.
-  // This is evaluated at server startup (runtime), so no API URL is baked into the
-  // build — one frontend image runs unchanged in local, cloud, PR, staging and prod.
-  async rewrites() {
-    const backend = process.env.BACKEND_URL_INTERNAL ?? 'http://localhost:3001'
-    return [{ source: '/api/:path*', destination: `${backend}/api/:path*` }]
-  },
+  // NOTE: the same-origin `/api/*` proxy lives in `middleware.ts`, NOT here.
+  // `next.config.js` rewrites are evaluated at BUILD time and inline `process.env`,
+  // so a runtime value like BACKEND_URL_INTERNAL can't be read from here. Middleware
+  // runs per-request and DOES see runtime env, keeping the image environment-agnostic.
 }
