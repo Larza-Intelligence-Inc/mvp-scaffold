@@ -58,6 +58,10 @@
           "activeOrganizationId": {
             "type": "string",
             "nullable": true
+          },
+          "activeTeamId": {
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [

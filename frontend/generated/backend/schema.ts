@@ -206,6 +206,7 @@ export interface components {
             userId: string;
             expiresAt: string;
             activeOrganizationId?: string | null;
+            activeTeamId?: string | null;
         };
         MeResponse: {
             user: components["schemas"]["MeUser"];
