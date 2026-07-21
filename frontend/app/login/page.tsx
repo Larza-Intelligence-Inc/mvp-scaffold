@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { AuthSplitLayout } from "@/components/application/auth-split-layout";
 import { Button } from "@/components/base/buttons/button";
 import { Input } from "@/components/base/input/input";
 import { appOrigin, authClient } from "@/lib/auth-client";
@@ -32,10 +33,13 @@ export default function LoginPage() {
     }
 
     return (
-        <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-6 py-16">
+        <AuthSplitLayout
+            panelTitle="Care that stays ahead."
+            panelSubtitle="Personalized preventative care, organized for the teams who deliver it."
+        >
             <div className="flex flex-col gap-8">
                 <div className="flex flex-col gap-2">
-                    <h1 className="text-display-xs font-semibold text-primary">Log in</h1>
+                    <h1 className="font-display text-display-xs font-medium tracking-tight text-primary">Log in</h1>
                     <p className="text-md text-tertiary">
                         New here?{" "}
                         <a className="font-medium text-brand-secondary hover:underline" href="/sign-up">
@@ -53,6 +57,7 @@ export default function LoginPage() {
                         value={email}
                         onChange={setEmail}
                         placeholder="ada@example.com"
+                        size="md"
                     />
                     <Input
                         isRequired
@@ -62,6 +67,7 @@ export default function LoginPage() {
                         value={password}
                         onChange={setPassword}
                         placeholder="••••••••"
+                        size="md"
                     />
                     {error ? <p className="text-sm text-error-primary">{error}</p> : null}
                     <Button type="submit" color="primary" size="lg" className="w-full" isDisabled={loading} isLoading={loading}>
@@ -69,6 +75,6 @@ export default function LoginPage() {
                     </Button>
                 </form>
             </div>
-        </main>
+        </AuthSplitLayout>
     );
 }
