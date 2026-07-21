@@ -2,6 +2,7 @@ import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi'
 import { swaggerUI } from '@hono/swagger-ui'
 import { cors } from 'hono/cors'
 import { auth } from './auth'
+import { defaultFrom, getResend } from './lib/resend'
 import { openApiConfig } from './openapi-config'
 
 const frontendOrigin = process.env.FRONTEND_ORIGIN ?? 'http://localhost:3000'
@@ -115,6 +116,65 @@ app.openapi(
       },
       200,
     )
+  },
+)
+
+// ---------- send email (Resend; mirrors hono-resend-examples POST /send) ----------
+const SendEmailBodySchema = z
+  .object({
+    to: z.string().email(),
+    subject: z.string().min(1),
+    message: z.string().min(1),
+  })
+  .openapi('SendEmailBody')
+
+const SendEmailResponseSchema = z
+  .object({
+    success: z.literal(true),
+    id: z.string().optional(),
+  })
+  .openapi('SendEmailResponse')
+
+app.openapi(
+  createRoute({
+    method: 'post',
+    path: '/api/send',
+    request: {
+      body: {
+        required: true,
+        content: { 'application/json': { schema: SendEmailBodySchema } },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Email accepted by Resend',
+        content: { 'application/json': { schema: SendEmailResponseSchema } },
+      },
+      400: { description: 'Invalid request', content: { 'application/json': { schema: ErrorSchema } } },
+      500: { description: 'Send failed', content: { 'application/json': { schema: ErrorSchema } } },
+      503: { description: 'Resend not configured', content: { 'application/json': { schema: ErrorSchema } } },
+    },
+  }),
+  async (c) => {
+    if (!process.env.RESEND_API_KEY) {
+      return c.json({ error: 'RESEND_API_KEY is not configured' }, 503)
+    }
+
+    const { to, subject, message } = c.req.valid('json')
+    const resend = getResend()
+    const { data, error } = await resend.emails.send({
+      from: defaultFrom(),
+      to: [to],
+      subject,
+      html: `<p>${message}</p>`,
+      text: message,
+    })
+
+    if (error) {
+      return c.json({ error: error.message }, 500)
+    }
+
+    return c.json({ success: true as const, id: data?.id }, 200)
   },
 )
 

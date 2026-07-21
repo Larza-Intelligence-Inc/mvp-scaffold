@@ -1,12 +1,13 @@
 {
   "snapshot": "snapshot-20260709-ce67c4d0-902a-4ec6-a143-2b191ea03633",
-  "install": "npm install --prefix backend --legacy-peer-deps\nnpm install --prefix frontend\npython3 -m venv .venv\n.venv/bin/pip install -e \".[dev]\"",
+  "agentCanUpdateSnapshot": true,
+  "install": "npm install --prefix backend --legacy-peer-deps\nnpm install --prefix frontend\npython3 -m venv .venv\n.venv/bin/pip install -e \".[dev]\"\n# Homebrew + Resend CLI (baked into snapshot; self-heal on cold boot)\nif [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then\n  eval \"$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)\"\nelif [ ! -x /home/linuxbrew/.linuxbrew/bin/brew ]; then\n  NONINTERACTIVE=1 /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\" || true\n  [ -x /home/linuxbrew/.linuxbrew/bin/brew ] && eval \"$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)\"\nfi\ngrep -q 'linuxbrew.*brew shellenv' ~/.bashrc 2>/dev/null || echo 'eval \"$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)\"' >> ~/.bashrc\nif ! command -v resend >/dev/null 2>&1; then\n  if command -v brew >/dev/null 2>&1; then\n    brew install resend/cli/resend\n  else\n    curl -fsSL https://resend.com/install.sh | bash\n    export PATH=\"$HOME/.resend/bin:$PATH\"\n  fi\nfi\nif [ -n \"${RESEND_API_KEY:-}\" ]; then\n  resend login --key \"$RESEND_API_KEY\" --json >/dev/null || true\nfi\nresend --version",
   "start": "sudo pg_ctlcluster 16 main start",
   "terminals": [
     {
       "name": "backend",
       "description": "Wait for Postgres, sync Drizzle schema (db:push), then run the Hono API on :3001",
-      "command": "until pg_isready -h localhost -q; do sleep 0.5; done; DATABASE_URL=\"postgres://app:dev@localhost:5432/app\" npm run db:push --prefix backend && PORT=3001 DATABASE_URL=\"postgres://app:dev@localhost:5432/app\" FRONTEND_ORIGIN=\"http://localhost:3000\" BETTER_AUTH_SECRET=\"2hkee/0PTQo7QHLQsAJ7F+WQxnP6qzXF+Tbk4daNRGo=\" BETTER_AUTH_URL=\"http://localhost:3001\" npm run dev --prefix backend"
+      "command": "eval \"$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash 2>/dev/null)\" || true; until pg_isready -h localhost -q; do sleep 0.5; done; DATABASE_URL=\"postgres://app:dev@localhost:5432/app\" npm run db:push --prefix backend && PORT=3001 DATABASE_URL=\"postgres://app:dev@localhost:5432/app\" FRONTEND_ORIGIN=\"http://localhost:3000\" BETTER_AUTH_SECRET=\"2hkee/0PTQo7QHLQsAJ7F+WQxnP6qzXF+Tbk4daNRGo=\" BETTER_AUTH_URL=\"http://localhost:3001\" RESEND_API_KEY=\"${RESEND_API_KEY:-}\" EMAIL_FROM=\"${EMAIL_FROM:-Acme <onboarding@resend.dev>}\" npm run dev --prefix backend"
     },
     {
       "name": "frontend",

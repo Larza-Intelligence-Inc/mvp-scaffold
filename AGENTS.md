@@ -22,3 +22,10 @@ Cloud boot is configured in `.cursor/environment.json`: `install` refreshes deps
 
 ### Python Railway setup tool (`scripts/railway/`)
 - Installed into `.venv` (editable). Run unit tests: `.venv/bin/pytest scripts/railway/tests/ -m "not integration"`. Integration tests need a live Railway API token and are skipped by default.
+
+### Resend (email + CLI + MCP)
+- **CLI**: Homebrew formula `resend/cli/resend` (PATH via `eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)"`). Fallback: `curl -fsSL https://resend.com/install.sh | bash` → `~/.resend/bin/resend`. Cloud `install` installs/logs in idempotently when missing.
+- **Auth (non-interactive)**: set Runtime Secret `RESEND_API_KEY` in the [Cloud Agents dashboard](https://cursor.com/dashboard/cloud-agents). `install` runs `resend login --key "$RESEND_API_KEY"` when the secret is present. Locally: `resend login --key re_…` or export `RESEND_API_KEY`.
+- **MCP**: project config at `.cursor/mcp.json` points at `https://mcp.resend.com/mcp` with `Authorization: Bearer ${env:RESEND_API_KEY}` (headless-safe; no browser OAuth). For Cloud Agents, also register the same server under Dashboard → Integrations & MCP if tools do not appear automatically.
+- **API**: backend `POST /api/send` (`{ to, subject, message }`) uses the Resend Node SDK. Optional `EMAIL_FROM` (default `Acme <onboarding@resend.dev>`).
+- **E2E proof**: `RESEND_API_KEY=… npm run test:resend --prefix backend` (Hono in-process request → live Resend send to `delivered@resend.dev`).
